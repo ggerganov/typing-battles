@@ -1,0 +1,296 @@
+<html>
+    <head>
+        <script src="incppect.js"></script>
+        <script src="names.js"></script>
+    </head>
+
+    <body style="font-family: Georgia, serif;">
+        <script>
+            var roomId = 0;
+
+            function random_nick() {
+                return generateName();
+            }
+
+            function random_color() {
+                return '#'+(0x1000000+(Math.random())*0xffffff).toString(16).substr(1,6);
+            }
+
+            function select_room(id) {
+                roomId = id;
+                join_room(-1);
+            }
+
+            function init() {
+                var output = document.createElement('div');
+                document.body.appendChild( output );
+
+                incppect.render = function() {
+                    var nrooms = this.get_int32('nrooms');
+                    var rooms = {};
+
+                    tcur_s = this.get_float('tcur_s');
+
+                    for (var i = 0; i < nrooms; ++i) {
+                        rooms[i] = {};
+                        rooms[i].name = this.get_str('rooms[%d].name', i);
+                        rooms[i].roundid = this.get_int32('rooms[%d].roundid', i);
+                        rooms[i].nplayers = this.get_int32('rooms[%d].nplayers', i);
+                        rooms[i].nwords = this.get_int32('rooms[%d].nwords', i);
+                        rooms[i].nold = this.get_int32('rooms[%d].nold', i);
+                        rooms[i].tstart_s = this.get_float('rooms[%d].tstart_s', i);
+                        rooms[i].tnextstart_s = this.get_float('rooms[%d].tnextstart_s', i);
+                        rooms[i].tlength_s = this.get_float('rooms[%d].tlength_s', i);
+                        rooms[i].words = {};
+                        rooms[i].old = {};
+                        rooms[i].players = {};
+                    }
+
+                    var active = false;
+                    var room = rooms[roomId];
+
+                    for (var i = 0; i < room.nold; ++i) {
+                        room.old[i] = {};
+                        room.old[i].x = this.get_float('rooms[%d].old[%d].x', roomId, i);
+                        room.old[i].y = this.get_float('rooms[%d].old[%d].y', roomId, i);
+                        room.old[i].word = this.get_str('rooms[%d].old[%d].word', roomId, i);
+                        room.old[i].color = this.get_str('rooms[%d].old[%d].color', roomId, i);
+                        room.old[i].tguessed_s = this.get_float('rooms[%d].old[%d].tguessed_s', roomId, i);
+                    }
+
+                    for (var i = 0; i < room.nplayers; ++i) {
+                        room.players[i] = {};
+                        room.players[i].name = this.get_str('rooms[%d].players[%d].name', roomId, i);
+                        room.players[i].color = this.get_str('rooms[%d].players[%d].color', roomId, i);
+                        room.players[i].score = this.get_float('rooms[%d].players[%d].score', roomId, i);
+                        room.players[i].active = this.get_int8('rooms[%d].players[%d].active', roomId, i);
+                    }
+
+                    if (tcur_s < room.tstart_s + room.tlength_s) {
+                        active = true;
+                        for (var i = 0; i < room.nwords; ++i) {
+                            room.words[i] = {};
+                            room.words[i].x = this.get_float('rooms[%d].words[%d].x', roomId, i);
+                            room.words[i].y = this.get_float('rooms[%d].words[%d].y', roomId, i);
+                            room.words[i].word = this.get_str('rooms[%d].words[%d].word', roomId, i);
+                        }
+                    }
+
+                    var room_list = document.getElementById('room-list');
+                    var room_list_new = '';
+
+                    for (var i = 0; i < nrooms; ++i) {
+                        room_list_new += '<button onclick="select_room(' + i + ');">' + rooms[i].name + ' (' + rooms[i].nplayers + ')</button><br>';
+                    }
+                    if (room_list.innerHTML != room_list_new) {
+                        room_list.innerHTML = room_list_new;
+                    }
+
+                    if (typeof room.roundid === 'undefined') {
+                        return;
+                    }
+
+                    var main_title = document.getElementById('main-title');
+                    main_title.innerHTML = 'Typing Battle - ' + room.name + ' (round ' + room.roundid + ')';
+
+                    var leaderboard = document.getElementById('leaderboard');
+                    leaderboard.innerHTML = '';
+
+                    for (var i = 0; i < room.nplayers; ++i) {
+                        var ts = 'opacity: 1.0;';
+                        if (room.players[i].active == 0) {
+                            ts = 'opacity: 0.3;';
+                        }
+                        leaderboard.innerHTML += '<font style="' + ts + '" color="' + room.players[i].color + '">' + room.players[i].name + '</font> - ' + room.players[i].score.toFixed(1) + '<br>';
+                    }
+
+                    var timer_left = document.getElementById('timer-left');
+                    if (active) {
+                        var tleft_s = room.tstart_s + room.tlength_s - tcur_s;
+                        if (tleft_s > 5.0) {
+                            timer_left.innerHTML = (tleft_s).toFixed(1) + ' s left';
+                        } else {
+                            timer_left.innerHTML = '<font color="red">' + (tleft_s).toFixed(1) + ' s left</font>';
+                        }
+                    } else {
+                        timer_left.innerHTML = '';
+                    }
+
+                    output.innerHTML = '';
+
+                    if (active) {
+                        var canvas = document.getElementById("canvas_words");
+
+                        var width = canvas.width;
+                        var height = canvas.height;
+                        var ctx = canvas.getContext("2d");
+
+                        ctx.font = '14px Arial';
+
+                        ctx.clearRect(0, 0, width, height);
+                        for (var i = 0; i < room.nwords; ++i) {
+                            var word = room.words[i];
+
+                            var cx = 0.5*(1.0 + word.x)*width - 0.5*ctx.measureText(word.word).width;
+                            var cy = 0.5*(1.0 + word.y)*height;
+
+                            ctx.globalAlpha = 1.0;
+                            ctx.fillStyle = '#000000';
+                            ctx.fillText(word.word, cx, cy);
+                        }
+                        for (var i = 0; i < room.nold; ++i) {
+                            var word = room.old[i];
+                            var t = Math.max(0.0, Math.min(1.0, 1.2*(tcur_s - word.tguessed_s)));
+
+                            var ws = ctx.measureText(word.word);
+                            var cx = 0.5*(1.0 + word.x)*width - 0.5*ws.width;
+                            var cy = 0.5*(1.0 + word.y)*height + 8.0*t;
+
+                            ctx.fillStyle = word.color;
+                            ctx.globalAlpha = 1.0 - t;
+                            ctx.fillText(word.word, cx, cy);
+                        }
+                    } else {
+                        var canvas = document.getElementById("canvas_words");
+
+                        var width = canvas.width;
+                        var height = canvas.height;
+                        var ctx = canvas.getContext("2d");
+
+                        ctx.clearRect(0, 0, width, height);
+
+                        ctx.font = '14px Arial';
+                        ctx.globalAlpha = 1.0;
+
+                        for (var i = 0; i < room.nold; ++i) {
+                            var word = room.old[i];
+
+                            var ws = ctx.measureText(word.word);
+                            var cx = 0.5*(1.0 + word.x)*width - 0.5*ws.width;
+                            var cy = 0.5*(1.0 + word.y)*height;
+
+                            ctx.fillStyle = word.color;
+                            ctx.fillText(word.word, cx, cy);
+                        }
+
+                        ctx.font = '32px Arial';
+
+                        var tstart = room.tnextstart_s - tcur_s;
+                        if (tstart < 5.0) {
+                            var text = 'Next round starts in ' + tstart.toFixed(1);
+                        } else {
+                            var text = 'Round ' + room.roundid + ' finished!';
+                        }
+
+                        var cx = 0.5*width - 0.5*ctx.measureText(text).width;
+                        var cy = 0.5*height;
+
+                        ctx.fillStyle = '#000000';
+                        ctx.fillText(text, cx, cy);
+                    }
+                }
+
+                incppect.onerror = function(evt) {
+                    if (typeof evt === 'object') {
+                        output.innerHTML = 'Error: check console for more information';
+                        console.error(evt);
+                    } else {
+                        //output.innerHTML = evt;
+                    }
+                }
+
+                incppect.onopen = function(evt) {
+                    document.getElementById('player-nick').value = localStorage['player-nick'] || random_nick();
+                    document.getElementById('player-color').value = localStorage['player-color'] || random_color();
+
+                    set_nick();
+
+                    document.getElementById('button-join').focus();
+                }
+
+                incppect.init();
+            }
+
+            function set_nick() {
+                incppect.send('10 ' + document.getElementById('player-nick').value);
+                incppect.send('11 ' + document.getElementById('player-color').value);
+            }
+
+            function join_room(id) {
+                localStorage['player-nick'] = document.getElementById('player-nick').value;
+                localStorage['player-color'] = document.getElementById('player-color').value;
+
+                set_nick();
+                incppect.send('20 ' + id);
+
+                if (id == -1) {
+                    document.getElementById('tr-nickname').style.display = 'table-row';
+                    document.getElementById('tr-input').style.display = 'none';
+                    document.getElementById('button-join').focus();
+                } else {
+                    document.getElementById('tr-nickname').style.display = 'none';
+                    document.getElementById('tr-input').style.display = 'table-row';
+                    document.getElementById('player-input').focus();
+                }
+            }
+
+            function submit_input(evt) {
+                if (event.key === 'Enter') {
+                    incppect.send('30 ' + roomId + ' ' + evt.value);
+                    document.getElementById('player-input').value = '';
+                }
+            }
+
+            init();
+
+        </script>
+
+        <div id=main-container align=center width=800px>
+            <br><br>
+            <table>
+                <tr>
+                    <th colspan=3>
+                        <h2 id="main-title">Typing Battle - C++ (round ?)</h3>
+                    </th>
+                </tr>
+                <tr>
+                    <td width=100px align=left valign=top>
+                        <h4>Rooms</h4>
+                        <div id="room-list" align=left>
+                        </div>
+                    </td>
+                    <td width=524px>
+                        <canvas id="canvas_words" width="512px" height="512px" style="border:1px solid #d3d3d3;">Your browser does not support the HTML5 canvas tag.</canvas>
+                    </td>
+                    <td width=176px align=right valign=top>
+                        <h4>Leaderboard</h4>
+                        <div id="leaderboard" align=right>
+                        </div>
+                    </td>
+                </tr>
+                <tr id="tr-nickname">
+                    <td>
+                    </td>
+                    <td colspan=2>
+                        Nickname:
+                        <input type="text" id="player-nick" maxlength=16 onkeypress="set_nick();">
+                        <input type="color" id="player-color" value="#e66465">
+                        <button id="button-join" onclick="join_room(roomId)">join</button>
+                    </td>
+                </tr>
+                <tr id="tr-input" style="display: none">
+                    <td>
+                    </td>
+                    <td>
+                        Input:
+                        <input id="player-input" type="text" autocomplete="off" onkeydown="submit_input(this)">
+                        <span id="timer-left"></span>
+                    </td>
+                    <td>
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+    </body>
+</html>
