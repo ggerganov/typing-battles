@@ -15,6 +15,9 @@
 #include <algorithm>
 #include <cctype>
 #include <locale>
+#include <mutex>
+#include <thread>
+#include <condition_variable>
 
 constexpr uint64_t kTimeBetweenRounds_ms = 20000;
 

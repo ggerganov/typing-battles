@@ -3,6 +3,8 @@ project(typing-battle)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS "on")
 
+find_package(Threads)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
