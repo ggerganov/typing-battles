@@ -6,7 +6,9 @@
 
     <body style="font-family: Georgia, serif;">
         <script>
-            var roomId = 0;
+            var room_id = localStorage['room-id'] || 0;
+
+            var rules_str = "Scoring:\n - match: 3.0 + 0.2*word.length\n - no match: -1.0";
 
             function random_nick() {
                 return generateName();
@@ -17,7 +19,8 @@
             }
 
             function select_room(id) {
-                roomId = id;
+                room_id = id;
+                localStorage['room-id'] = room_id;
                 join_room(-1);
             }
 
@@ -36,44 +39,14 @@
                         rooms[i].name = this.get_str('rooms[%d].name', i);
                         rooms[i].roundid = this.get_int32('rooms[%d].roundid', i);
                         rooms[i].nplayers = this.get_int32('rooms[%d].nplayers', i);
-                        rooms[i].nwords = this.get_int32('rooms[%d].nwords', i);
+                        rooms[i].nqueries = this.get_int32('rooms[%d].nqueries', i);
                         rooms[i].nold = this.get_int32('rooms[%d].nold', i);
                         rooms[i].tstart_s = this.get_float('rooms[%d].tstart_s', i);
                         rooms[i].tnextstart_s = this.get_float('rooms[%d].tnextstart_s', i);
                         rooms[i].tlength_s = this.get_float('rooms[%d].tlength_s', i);
-                        rooms[i].words = {};
-                        rooms[i].old = {};
+                        rooms[i].pool = {};
+                        rooms[i].pool_old = {};
                         rooms[i].players = {};
-                    }
-
-                    var active = false;
-                    var room = rooms[roomId];
-
-                    for (var i = 0; i < room.nold; ++i) {
-                        room.old[i] = {};
-                        room.old[i].x = this.get_float('rooms[%d].old[%d].x', roomId, i);
-                        room.old[i].y = this.get_float('rooms[%d].old[%d].y', roomId, i);
-                        room.old[i].word = this.get_str('rooms[%d].old[%d].word', roomId, i);
-                        room.old[i].color = this.get_str('rooms[%d].old[%d].color', roomId, i);
-                        room.old[i].tguessed_s = this.get_float('rooms[%d].old[%d].tguessed_s', roomId, i);
-                    }
-
-                    for (var i = 0; i < room.nplayers; ++i) {
-                        room.players[i] = {};
-                        room.players[i].name = this.get_str('rooms[%d].players[%d].name', roomId, i);
-                        room.players[i].color = this.get_str('rooms[%d].players[%d].color', roomId, i);
-                        room.players[i].score = this.get_float('rooms[%d].players[%d].score', roomId, i);
-                        room.players[i].active = this.get_int8('rooms[%d].players[%d].active', roomId, i);
-                    }
-
-                    if (tcur_s < room.tstart_s + room.tlength_s) {
-                        active = true;
-                        for (var i = 0; i < room.nwords; ++i) {
-                            room.words[i] = {};
-                            room.words[i].x = this.get_float('rooms[%d].words[%d].x', roomId, i);
-                            room.words[i].y = this.get_float('rooms[%d].words[%d].y', roomId, i);
-                            room.words[i].word = this.get_str('rooms[%d].words[%d].word', roomId, i);
-                        }
                     }
 
                     var room_list = document.getElementById('room-list');
@@ -86,6 +59,36 @@
                         room_list.innerHTML = room_list_new;
                     }
 
+                    var active = false;
+                    var room = rooms[room_id];
+
+                    for (var i = 0; i < room.nold; ++i) {
+                        room.pool_old[i] = {};
+                        room.pool_old[i].x = this.get_float('rooms[%d].pool_old[%d].x', room_id, i);
+                        room.pool_old[i].y = this.get_float('rooms[%d].pool_old[%d].y', room_id, i);
+                        room.pool_old[i].text = this.get_str('rooms[%d].pool_old[%d].text', room_id, i);
+                        room.pool_old[i].color = this.get_str('rooms[%d].pool_old[%d].color', room_id, i);
+                        room.pool_old[i].tguessed_s = this.get_float('rooms[%d].pool_old[%d].tguessed_s', room_id, i);
+                    }
+
+                    for (var i = 0; i < room.nplayers; ++i) {
+                        room.players[i] = {};
+                        room.players[i].name = this.get_str('rooms[%d].players[%d].name', room_id, i);
+                        room.players[i].color = this.get_str('rooms[%d].players[%d].color', room_id, i);
+                        room.players[i].score = this.get_float('rooms[%d].players[%d].score', room_id, i);
+                        room.players[i].active = this.get_int8('rooms[%d].players[%d].active', room_id, i);
+                    }
+
+                    if (tcur_s < room.tstart_s + room.tlength_s) {
+                        active = true;
+                        for (var i = 0; i < room.nqueries; ++i) {
+                            room.pool[i] = {};
+                            room.pool[i].x = this.get_float('rooms[%d].pool[%d].x', room_id, i);
+                            room.pool[i].y = this.get_float('rooms[%d].pool[%d].y', room_id, i);
+                            room.pool[i].text = this.get_str('rooms[%d].pool[%d].text', room_id, i);
+                        }
+                    }
+
                     if (typeof room.roundid === 'undefined') {
                         return;
                     }
@@ -96,18 +99,29 @@
                     var leaderboard = document.getElementById('leaderboard');
                     leaderboard.innerHTML = '';
 
+                    var rankings = [];
                     for (var i = 0; i < room.nplayers; ++i) {
+                        var entry = {};
+                        entry.score = room.players[i].score;
+                        entry.name = room.players[i].name;
+                        entry.color = room.players[i].color;
+                        entry.active = room.players[i].active;
+                        rankings.push(entry)
+                    }
+                    rankings.sort(function(a, b){ return b.score - a.score });
+
+                    for (var i = 0; i < rankings.length; ++i) {
                         var ts = 'opacity: 1.0;';
-                        if (room.players[i].active == 0) {
+                        if (rankings[i].active == 0) {
                             ts = 'opacity: 0.3;';
                         }
-                        leaderboard.innerHTML += '<font style="' + ts + '" color="' + room.players[i].color + '">' + room.players[i].name + '</font> - ' + room.players[i].score.toFixed(1) + '<br>';
+                        leaderboard.innerHTML += '<font style="' + ts + '" color="' + rankings[i].color + '">' + rankings[i].name + '</font> - ' + rankings[i].score.toFixed(1) + '<br>';
                     }
 
                     var timer_left = document.getElementById('timer-left');
                     if (active) {
                         var tleft_s = room.tstart_s + room.tlength_s - tcur_s;
-                        if (tleft_s > 5.0) {
+                        if (tleft_s > 10.0) {
                             timer_left.innerHTML = (tleft_s).toFixed(1) + ' s left';
                         } else {
                             timer_left.innerHTML = '<font color="red">' + (tleft_s).toFixed(1) + ' s left</font>';
@@ -119,7 +133,7 @@
                     output.innerHTML = '';
 
                     if (active) {
-                        var canvas = document.getElementById("canvas_words");
+                        var canvas = document.getElementById("canvas_queries");
 
                         var width = canvas.width;
                         var height = canvas.height;
@@ -128,30 +142,30 @@
                         ctx.font = '14px Arial';
 
                         ctx.clearRect(0, 0, width, height);
-                        for (var i = 0; i < room.nwords; ++i) {
-                            var word = room.words[i];
+                        for (var i = 0; i < room.nqueries; ++i) {
+                            var query = room.pool[i];
 
-                            var cx = 0.5*(1.0 + word.x)*width - 0.5*ctx.measureText(word.word).width;
-                            var cy = 0.5*(1.0 + word.y)*height;
+                            var cx = 0.5*(1.0 + query.x)*width - 0.5*ctx.measureText(query.text).width;
+                            var cy = 0.5*(1.0 + query.y)*height;
 
                             ctx.globalAlpha = 1.0;
                             ctx.fillStyle = '#000000';
-                            ctx.fillText(word.word, cx, cy);
+                            ctx.fillText(query.text, cx, cy);
                         }
                         for (var i = 0; i < room.nold; ++i) {
-                            var word = room.old[i];
-                            var t = Math.max(0.0, Math.min(1.0, 1.2*(tcur_s - word.tguessed_s)));
+                            var query = room.pool_old[i];
+                            var t = Math.max(0.0, Math.min(1.0, 1.2*(tcur_s - query.tguessed_s)));
 
-                            var ws = ctx.measureText(word.word);
-                            var cx = 0.5*(1.0 + word.x)*width - 0.5*ws.width;
-                            var cy = 0.5*(1.0 + word.y)*height + 8.0*t;
+                            var ws = ctx.measureText(query.text);
+                            var cx = 0.5*(1.0 + query.x)*width - 0.5*ws.width;
+                            var cy = 0.5*(1.0 + query.y)*height + 8.0*t;
 
-                            ctx.fillStyle = word.color;
+                            ctx.fillStyle = query.color;
                             ctx.globalAlpha = 1.0 - t;
-                            ctx.fillText(word.word, cx, cy);
+                            ctx.fillText(query.text, cx, cy);
                         }
                     } else {
-                        var canvas = document.getElementById("canvas_words");
+                        var canvas = document.getElementById("canvas_queries");
 
                         var width = canvas.width;
                         var height = canvas.height;
@@ -163,14 +177,14 @@
                         ctx.globalAlpha = 1.0;
 
                         for (var i = 0; i < room.nold; ++i) {
-                            var word = room.old[i];
+                            var query = room.pool_old[i];
 
-                            var ws = ctx.measureText(word.word);
-                            var cx = 0.5*(1.0 + word.x)*width - 0.5*ws.width;
-                            var cy = 0.5*(1.0 + word.y)*height;
+                            var ws = ctx.measureText(query.text);
+                            var cx = 0.5*(1.0 + query.x)*width - 0.5*ws.width;
+                            var cy = 0.5*(1.0 + query.y)*height;
 
-                            ctx.fillStyle = word.color;
-                            ctx.fillText(word.word, cx, cy);
+                            ctx.fillStyle = query.color;
+                            ctx.fillText(query.text, cx, cy);
                         }
 
                         ctx.font = '32px Arial';
@@ -236,7 +250,7 @@
 
             function submit_input(evt) {
                 if (event.key === 'Enter') {
-                    incppect.send('30 ' + roomId + ' ' + evt.value);
+                    incppect.send('30 ' + room_id + ' ' + evt.value);
                     document.getElementById('player-input').value = '';
                 }
             }
@@ -245,25 +259,28 @@
 
         </script>
 
-        <div id=main-container align=center width=800px>
+        <div id=main-container align=center width=876px>
             <br><br>
             <table>
                 <tr>
                     <th colspan=3>
-                        <h2 id="main-title">Typing Battle - C++ (round ?)</h3>
+                        <h2 id="main-title">Typing Battle - C++ (round ?)</h2>
+                        <a href="#rules" onclick="alert(rules_str); return true;">(rules)</a>
                     </th>
                 </tr>
                 <tr>
-                    <td width=100px align=left valign=top>
+                    <td width=180px align=left valign=top>
                         <h4>Rooms</h4>
+                        <hr>
                         <div id="room-list" align=left>
                         </div>
                     </td>
-                    <td width=524px>
-                        <canvas id="canvas_words" width="512px" height="512px" style="border:1px solid #d3d3d3;">Your browser does not support the HTML5 canvas tag.</canvas>
+                    <td width=512px>
+                        <canvas id="canvas_queries" width="512px" height="512px" style="border:1px solid #d3d3d3;">Your browser does not support the HTML5 canvas tag.</canvas>
                     </td>
-                    <td width=176px align=right valign=top>
+                    <td width=180px align=right valign=top>
                         <h4>Leaderboard</h4>
+                        <hr>
                         <div id="leaderboard" align=right>
                         </div>
                     </td>
@@ -275,7 +292,7 @@
                         Nickname:
                         <input type="text" id="player-nick" maxlength=16 onkeypress="set_nick();">
                         <input type="color" id="player-color" value="#e66465">
-                        <button id="button-join" onclick="join_room(roomId)">join</button>
+                        <button id="button-join" onclick="join_room(room_id)">join</button>
                     </td>
                 </tr>
                 <tr id="tr-input" style="display: none">
