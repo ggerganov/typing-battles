@@ -35,10 +35,15 @@ int main(int argc, char ** argv) {
     rooms.emplace_back(RoomWords::getEnglish(RoomWords::Parameters { .pathData = pathData + "/" }));
     rooms.emplace_back(RoomMath::getMathAdd(RoomMath::Parameters { }));
     rooms.emplace_back(RoomMath::getMathSqrt(RoomMath::Parameters { }));
+    rooms.emplace_back(RoomWords::getCppBR(RoomWords::Parameters { .pathData = pathData + "/" }));
+    rooms.emplace_back(RoomWords::getEnglishBR(RoomWords::Parameters { .pathData = pathData + "/" }));
+    rooms.emplace_back(RoomMath::getMathAddBR(RoomMath::Parameters { }));
+    rooms.emplace_back(RoomMath::getMathSqrtBR(RoomMath::Parameters { }));
 
     Incppect::getInstance().var("tcur_s", [&](const auto & ) { static float t; t = timestamp_s(); return Incppect::view(t); });
     Incppect::getInstance().var("nrooms", [&](const auto & ) { static int n; n = rooms.size(); return Incppect::view(n); });
     Incppect::getInstance().var("rooms[%d].name", [&](const auto & idxs) { return rooms[idxs[0]]->name.data(); });
+    Incppect::getInstance().var("rooms[%d].mode", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->mode); });
     Incppect::getInstance().var("rooms[%d].roundid", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->roundId); });
     Incppect::getInstance().var("rooms[%d].nplayers", [&](const auto & idxs) { static int n; n = rooms[idxs[0]]->players.size(); return Incppect::view(n); });
     Incppect::getInstance().var("rooms[%d].nqueries", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->poolSize); });
@@ -150,7 +155,7 @@ int main(int argc, char ** argv) {
 
             Event event;
             event.roomId = i;
-            event.type = Event::StartNewRound;
+            event.type = Event::CheckStart;
 
             events.push(std::move(event));
         });
@@ -185,9 +190,11 @@ int main(int argc, char ** argv) {
                 }
                 break;
             case Event::StartNewRound:
+            case Event::CheckStart:
             case Event::EndRound:
             case Event::PlayerInput:
             case Event::PlayerJoinRoom:
+            case Event::EndBRRound:
                 {
                     for (auto & room : rooms) {
                         room->handle(std::move(event));

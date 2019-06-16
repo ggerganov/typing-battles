@@ -54,6 +54,7 @@ struct RoomMath : public RoomBase {
     static std::shared_ptr<RoomBase> getMathAdd(Parameters parameters) {
         auto result = std::make_shared<RoomMath>();
 
+        result->mode = Standard;
         result->name = "Math [+]";
         result->poolSize = 30;
         result->tCreated_s = timestamp_s();
@@ -73,6 +74,7 @@ struct RoomMath : public RoomBase {
     static std::shared_ptr<RoomBase> getMathSqrt(Parameters parameters) {
         auto result = std::make_shared<RoomMath>();
 
+        result->mode = Standard;
         result->name = "Math [sqrt]";
         result->poolSize = 30;
         result->tCreated_s = timestamp_s();
@@ -88,5 +90,48 @@ struct RoomMath : public RoomBase {
 
         return result;
     }
+
+    static std::shared_ptr<RoomBase> getMathAddBR(Parameters parameters) {
+        auto result = std::make_shared<RoomMath>();
+
+        result->mode = BattleRoyale;
+        result->name = "Math [+,BR]";
+        result->poolSize = 30;
+        result->tCreated_s = timestamp_s();
+        result->tRoundLength_s = 0.25f*60.f;
+        result->tBRRoundLength_s = 0.25f*60.f;
+        result->tRoundStart_s = result->tCreated_s - result->tRoundLength_s;
+
+        result->getQuery = [](int a, int b) -> std::pair<std::string, std::string> {
+            return {
+                std::to_string(a) + "+" + std::to_string(b),
+                std::to_string(a+b),
+            };
+        };
+
+        return result;
+    }
+
+    static std::shared_ptr<RoomBase> getMathSqrtBR(Parameters parameters) {
+        auto result = std::make_shared<RoomMath>();
+
+        result->mode = BattleRoyale;
+        result->name = "Math [sqrt, BR]";
+        result->poolSize = 30;
+        result->tCreated_s = timestamp_s();
+        result->tRoundLength_s = 0.25f*60.f;
+        result->tBRRoundLength_s = 0.25f*60.f;
+        result->tRoundStart_s = result->tCreated_s - result->tRoundLength_s;
+
+        result->getQuery = [](int a, int b) -> std::pair<std::string, std::string> {
+            return {
+                std::to_string(a*a),
+                std::to_string(a),
+            };
+        };
+
+        return result;
+    }
+
 };
 

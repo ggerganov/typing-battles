@@ -8,7 +8,7 @@
         <script>
             var room_id = localStorage['room-id'] || 0;
 
-            var rules_str = "Scoring:\n - match: 3.0 + 0.2*word.length\n - no match: -1.0";
+            var rules_str = "Scoring:\n - match: 3.0 + 0.2*input.length\n - no match: -1.0";
 
             function random_nick() {
                 return generateName();
@@ -37,6 +37,7 @@
                     for (var i = 0; i < nrooms; ++i) {
                         rooms[i] = {};
                         rooms[i].name = this.get_str('rooms[%d].name', i);
+                        rooms[i].mode = this.get_int8('rooms[%d].mode', i);
                         rooms[i].roundid = this.get_int32('rooms[%d].roundid', i);
                         rooms[i].nplayers = this.get_int32('rooms[%d].nplayers', i);
                         rooms[i].nqueries = this.get_int32('rooms[%d].nqueries', i);
@@ -57,7 +58,7 @@
                         if (room_id == i) {
                             name = "<b>" + name + "</b>";
                         }
-                        room_list_new += '<button onclick="select_room(' + i + ');">' + name + ' (' + rooms[i].nplayers + ')</button><br>';
+                        room_list_new += '<button onclick="select_room(' + i + ');">(' + rooms[i].nplayers + ') ' + name + '</button><br>';
                     }
                     if (room_list.innerHTML != room_list_new) {
                         room_list.innerHTML = room_list_new;
@@ -119,6 +120,9 @@
                         if (rankings[i].active == 0) {
                             ts = 'opacity: 0.3;';
                         }
+                        if (rankings[i].active == 2) {
+                            ts = 'text-decoration: line-through;';
+                        }
                         leaderboard.innerHTML += '<font style="' + ts + '" color="' + rankings[i].color + '">' + rankings[i].name + '</font> - ' + rankings[i].score.toFixed(1) + '<br>';
                     }
 
@@ -146,6 +150,11 @@
                         ctx.font = '14px Arial';
 
                         ctx.clearRect(0, 0, width, height);
+
+                        ctx.globalAlpha = 0.5;
+                        ctx.fillStyle = '#000000';
+                        ctx.fillText((tleft_s).toFixed(1), 0.0, 12.0);
+
                         for (var i = 0; i < room.nqueries; ++i) {
                             var query = room.pool[i];
 
@@ -194,7 +203,7 @@
                         ctx.font = '32px Arial';
 
                         var tstart = room.tnextstart_s - tcur_s;
-                        if (tstart < 5.0) {
+                        if (tstart < 15.0) {
                             var text = 'Next round starts in ' + tstart.toFixed(1);
                         } else {
                             var text = 'Round ' + room.roundid + ' finished!';
@@ -205,6 +214,18 @@
 
                         ctx.fillStyle = '#000000';
                         ctx.fillText(text, cx, cy);
+
+                        if (room.mode == 1 && tstart >= 15.0) {
+                            ctx.font = '16px Arial';
+
+                            var text = 'BR mode: waiting for at least 2 players to join';
+
+                            var cx = 0.5*width - 0.5*ctx.measureText(text).width;
+                            var cy = 0.6*height;
+
+                            ctx.fillStyle = '#000000';
+                            ctx.fillText(text, cx, cy);
+                        }
                     }
                 }
 

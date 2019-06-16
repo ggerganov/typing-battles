@@ -72,6 +72,7 @@ struct RoomWords : public RoomBase {
     static std::shared_ptr<RoomBase> getCpp(Parameters parameters) {
         auto result = std::make_shared<RoomWords>();
 
+        result->mode = Standard;
         result->name = "C++";
         result->dictionary = Dictionary::load(parameters.pathData + "words_cpp.txt");
         result->poolSize = 30;
@@ -85,6 +86,7 @@ struct RoomWords : public RoomBase {
     static std::shared_ptr<RoomBase> getEnglish(Parameters parameters) {
         auto result = std::make_shared<RoomWords>();
 
+        result->mode = Standard;
         result->name = "English";
         result->dictionary = Dictionary::load(parameters.pathData + "words_alpha.txt");
         result->poolSize = 30;
@@ -94,5 +96,36 @@ struct RoomWords : public RoomBase {
 
         return result;
     }
+
+    static std::shared_ptr<RoomBase> getCppBR(Parameters parameters) {
+        auto result = std::make_shared<RoomWords>();
+
+        result->mode = BattleRoyale;
+        result->name = "C++ [BR]";
+        result->dictionary = Dictionary::load(parameters.pathData + "words_cpp.txt");
+        result->poolSize = 30;
+        result->tCreated_s = timestamp_s();
+        result->tRoundLength_s = 0.25f*60.f;
+        result->tBRRoundLength_s = 0.25f*60.f;
+        result->tRoundStart_s = result->tCreated_s - result->tRoundLength_s;
+
+        return result;
+    }
+
+    static std::shared_ptr<RoomBase> getEnglishBR(Parameters parameters) {
+        auto result = std::make_shared<RoomWords>();
+
+        result->mode = BattleRoyale;
+        result->name = "English [BR]";
+        result->dictionary = Dictionary::load(parameters.pathData + "words_alpha.txt");
+        result->poolSize = 30;
+        result->tCreated_s = timestamp_s();
+        result->tRoundLength_s = 0.25f*60.f;
+        result->tBRRoundLength_s = 0.25f*60.f;
+        result->tRoundStart_s = result->tCreated_s - result->tRoundLength_s;
+
+        return result;
+    }
+
 };
 
