@@ -2,7 +2,7 @@
 
 A multiplayer typing game.
 
-<a href="https://i.imgur.com/Alm6Cvj.png" target="_blank">![typing-battles](https://i.imgur.com/Alm6Cvj.png)</a>
+<a href="https://i.imgur.com/drL2D9E.png" target="_blank">![typing-battles](https://i.imgur.com/drL2D9E.png)</a>
 
 ## Running a server
 
