@@ -1,6 +1,8 @@
 # typing-battles
 
-A multi-player typing game.
+A multiplayer typing game.
+
+<a href="https://i.imgur.com/Alm6Cvj.png" target="_blank">![typing-battles](https://i.imgur.com/Alm6Cvj.png)</a>
 
 ## Running a server
 
