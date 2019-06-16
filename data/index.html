@@ -53,7 +53,11 @@
                     var room_list_new = '';
 
                     for (var i = 0; i < nrooms; ++i) {
-                        room_list_new += '<button onclick="select_room(' + i + ');">' + rooms[i].name + ' (' + rooms[i].nplayers + ')</button><br>';
+                        var name = rooms[i].name;
+                        if (room_id == i) {
+                            name = "<b>" + name + "</b>";
+                        }
+                        room_list_new += '<button onclick="select_room(' + i + ');">' + name + ' (' + rooms[i].nplayers + ')</button><br>';
                     }
                     if (room_list.innerHTML != room_list_new) {
                         room_list.innerHTML = room_list_new;
