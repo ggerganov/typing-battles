@@ -7,8 +7,8 @@
     <body style="font-family: Georgia, serif;">
         <script>
             var room_id = localStorage['room-id'] || 0;
-
             var rules_str = "Scoring:\n - match: 3.0 + 0.2*input.length\n - no match: -1.0";
+            var room_types = { 0: 'Standard', 1: 'Battle-Royale' };
 
             function random_nick() {
                 return generateName();
@@ -29,8 +29,8 @@
                 document.body.appendChild( output );
 
                 incppect.render = function() {
-                    var nrooms = this.get_int32('nrooms');
                     var rooms = {};
+                    var nrooms = this.get_int32('nrooms');
 
                     tcur_s = this.get_float('tcur_s');
 
@@ -53,13 +53,19 @@
                     var room_list = document.getElementById('room-list');
                     var room_list_new = '';
 
-                    for (var i = 0; i < nrooms; ++i) {
-                        var name = rooms[i].name;
-                        if (room_id == i) {
-                            name = "<b>" + name + "</b>";
+                    for (var type in room_types ) {
+                        room_list_new += '<pre>' + room_types[type] + ':</pre>';
+                        for (var i = 0; i < nrooms; ++i) {
+                            if (rooms[i].mode != type) continue;
+
+                            var name = rooms[i].name;
+                            if (room_id == i) {
+                                name = "<b>" + name + "</b>";
+                            }
+                            room_list_new += '<button onclick="select_room(' + i + ');">(' + rooms[i].nplayers + ') ' + name + '</button><br>';
                         }
-                        room_list_new += '<button onclick="select_room(' + i + ');">(' + rooms[i].nplayers + ') ' + name + '</button><br>';
                     }
+
                     if (room_list.innerHTML != room_list_new) {
                         room_list.innerHTML = room_list_new;
                     }
@@ -76,6 +82,7 @@
                         room.pool_old[i].tguessed_s = this.get_float('rooms[%d].pool_old[%d].tguessed_s', room_id, i);
                     }
 
+                    var my_id = this.get_int32('rooms[%d].my_id[%d]', room_id, -1);
                     for (var i = 0; i < room.nplayers; ++i) {
                         room.players[i] = {};
                         room.players[i].name = this.get_str('rooms[%d].players[%d].name', room_id, i);
@@ -107,6 +114,7 @@
                     var rankings = [];
                     for (var i = 0; i < room.nplayers; ++i) {
                         var entry = {};
+                        entry.id = i;
                         entry.score = room.players[i].score;
                         entry.name = room.players[i].name;
                         entry.color = room.players[i].color;
@@ -123,16 +131,24 @@
                         if (rankings[i].active == 2) {
                             ts = 'text-decoration: line-through;';
                         }
+                        if (rankings[i].id == my_id) {
+                            leaderboard.innerHTML += '* ';
+                        }
                         leaderboard.innerHTML += '<font style="' + ts + '" color="' + rankings[i].color + '">' + rankings[i].name + '</font> - ' + rankings[i].score.toFixed(1) + '<br>';
                     }
 
                     var timer_left = document.getElementById('timer-left');
                     if (active) {
                         var tleft_s = room.tstart_s + room.tlength_s - tcur_s;
+                        var text = (tleft_s).toFixed(1) + ' s left';
+                        if (my_id >= 0) {
+                            document.getElementById('player-input').readOnly = room.players[my_id].active != 1;
+                            text += ' / ' + room.players[my_id].score.toFixed(1) + ' pts';
+                        }
                         if (tleft_s > 10.0) {
-                            timer_left.innerHTML = (tleft_s).toFixed(1) + ' s left';
+                            timer_left.innerHTML = text;
                         } else {
-                            timer_left.innerHTML = '<font color="red">' + (tleft_s).toFixed(1) + ' s left</font>';
+                            timer_left.innerHTML = '<font color="red">' + text + '</font>';
                         }
                     } else {
                         timer_left.innerHTML = '';

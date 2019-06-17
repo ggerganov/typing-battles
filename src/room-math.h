@@ -71,26 +71,6 @@ struct RoomMath : public RoomBase {
         return result;
     }
 
-    static std::shared_ptr<RoomBase> getMathSqrt(Parameters parameters) {
-        auto result = std::make_shared<RoomMath>();
-
-        result->mode = Standard;
-        result->name = "Math [sqrt]";
-        result->poolSize = 30;
-        result->tCreated_s = timestamp_s();
-        result->tRoundLength_s = 1.0f*60.f;
-        result->tRoundStart_s = result->tCreated_s - result->tRoundLength_s;
-
-        result->getQuery = [](int a, int b) -> std::pair<std::string, std::string> {
-            return {
-                std::to_string(a*a),
-                std::to_string(a),
-            };
-        };
-
-        return result;
-    }
-
     static std::shared_ptr<RoomBase> getMathAddBR(Parameters parameters) {
         auto result = std::make_shared<RoomMath>();
 
@@ -106,6 +86,26 @@ struct RoomMath : public RoomBase {
             return {
                 std::to_string(a) + "+" + std::to_string(b),
                 std::to_string(a+b),
+            };
+        };
+
+        return result;
+    }
+
+    static std::shared_ptr<RoomBase> getMathSqrt(Parameters parameters) {
+        auto result = std::make_shared<RoomMath>();
+
+        result->mode = Standard;
+        result->name = "Math [sqrt]";
+        result->poolSize = 30;
+        result->tCreated_s = timestamp_s();
+        result->tRoundLength_s = 1.0f*60.f;
+        result->tRoundStart_s = result->tCreated_s - result->tRoundLength_s;
+
+        result->getQuery = [](int a, int b) -> std::pair<std::string, std::string> {
+            return {
+                std::to_string(a*a),
+                std::to_string(a),
             };
         };
 

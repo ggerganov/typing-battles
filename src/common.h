@@ -146,6 +146,16 @@ struct RoomBase {
 
     Notifier notifier;
 
+    int32_t playerId(int32_t clientId) {
+        for (int i = 0; i < (int) players.size(); ++i) {
+            if (players[i].clientId == clientId) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
     virtual Query generate() = 0;
 
     virtual void handle(Event && event) {

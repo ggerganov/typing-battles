@@ -83,20 +83,6 @@ struct RoomWords : public RoomBase {
         return result;
     }
 
-    static std::shared_ptr<RoomBase> getEnglish(Parameters parameters) {
-        auto result = std::make_shared<RoomWords>();
-
-        result->mode = Standard;
-        result->name = "English";
-        result->dictionary = Dictionary::load(parameters.pathData + "words_alpha.txt");
-        result->poolSize = 30;
-        result->tCreated_s = timestamp_s();
-        result->tRoundLength_s = 1.0f*60.f;
-        result->tRoundStart_s = result->tCreated_s - result->tRoundLength_s;
-
-        return result;
-    }
-
     static std::shared_ptr<RoomBase> getCppBR(Parameters parameters) {
         auto result = std::make_shared<RoomWords>();
 
@@ -107,6 +93,49 @@ struct RoomWords : public RoomBase {
         result->tCreated_s = timestamp_s();
         result->tRoundLength_s = 0.25f*60.f;
         result->tBRRoundLength_s = 0.25f*60.f;
+        result->tRoundStart_s = result->tCreated_s - result->tRoundLength_s;
+
+        return result;
+    }
+
+    static std::shared_ptr<RoomBase> getGit(Parameters parameters) {
+        auto result = std::make_shared<RoomWords>();
+
+        result->mode = Standard;
+        result->name = "Git";
+        result->dictionary = Dictionary::load(parameters.pathData + "words_git.txt");
+        result->poolSize = 15;
+        result->tCreated_s = timestamp_s();
+        result->tRoundLength_s = 1.0f*60.f;
+        result->tRoundStart_s = result->tCreated_s - result->tRoundLength_s;
+
+        return result;
+    }
+
+    static std::shared_ptr<RoomBase> getGitBR(Parameters parameters) {
+        auto result = std::make_shared<RoomWords>();
+
+        result->mode = BattleRoyale;
+        result->name = "Git [BR]";
+        result->dictionary = Dictionary::load(parameters.pathData + "words_git.txt");
+        result->poolSize = 15;
+        result->tCreated_s = timestamp_s();
+        result->tRoundLength_s = 0.25f*60.f;
+        result->tBRRoundLength_s = 0.25f*60.f;
+        result->tRoundStart_s = result->tCreated_s - result->tRoundLength_s;
+
+        return result;
+    }
+
+    static std::shared_ptr<RoomBase> getEnglish(Parameters parameters) {
+        auto result = std::make_shared<RoomWords>();
+
+        result->mode = Standard;
+        result->name = "English";
+        result->dictionary = Dictionary::load(parameters.pathData + "words_alpha.txt");
+        result->poolSize = 30;
+        result->tCreated_s = timestamp_s();
+        result->tRoundLength_s = 1.0f*60.f;
         result->tRoundStart_s = result->tCreated_s - result->tRoundLength_s;
 
         return result;
