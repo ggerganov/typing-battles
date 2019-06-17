@@ -2,6 +2,7 @@
     <head>
         <script src="incppect.js"></script>
         <script src="names.js"></script>
+        <script src="particles.js"></script>
     </head>
 
     <body style="font-family: Georgia, serif;">
@@ -22,6 +23,15 @@
                 room_id = id;
                 localStorage['room-id'] = room_id;
                 join_room(-1);
+            }
+
+            function hexToRgb(hex) {
+                var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : null;
             }
 
             function init() {
@@ -157,6 +167,7 @@
                     output.innerHTML = '';
 
                     if (active) {
+                        var do_effects = document.getElementById('do-effects').checked;
                         var canvas = document.getElementById("canvas_queries");
 
                         var width = canvas.width;
@@ -171,16 +182,37 @@
                         ctx.fillStyle = '#000000';
                         ctx.fillText((tleft_s).toFixed(1), 0.0, 12.0);
 
+                        var sx = 0.0;
+                        var sy = 0.0;
+
+                        if (do_effects) {
+                            for (var i = 0; i < room.nold; ++i) {
+                                var query = room.pool_old[i];
+                                var t = Math.max(0.0, Math.min(1.0, 1.2*(tcur_s - query.tguessed_s)));
+
+                                t = 1.0 - t;
+                                t *= t;
+                                t *= t;
+
+                                sx += (5.0*Math.random() - 2.5)*t;
+                                sy += (5.0*Math.random() - 2.5)*t;
+                            }
+                        }
+
                         for (var i = 0; i < room.nqueries; ++i) {
                             var query = room.pool[i];
 
                             var cx = 0.5*(1.0 + query.x)*width - 0.5*ctx.measureText(query.text).width;
                             var cy = 0.5*(1.0 + query.y)*height;
 
+                            cx += 25.0*sx/query.text.length;
+                            cy += 25.0*sy/query.text.length;
+
                             ctx.globalAlpha = 1.0;
                             ctx.fillStyle = '#000000';
                             ctx.fillText(query.text, cx, cy);
                         }
+
                         for (var i = 0; i < room.nold; ++i) {
                             var query = room.pool_old[i];
                             var t = Math.max(0.0, Math.min(1.0, 1.2*(tcur_s - query.tguessed_s)));
@@ -188,6 +220,16 @@
                             var ws = ctx.measureText(query.text);
                             var cx = 0.5*(1.0 + query.x)*width - 0.5*ws.width;
                             var cy = 0.5*(1.0 + query.y)*height + 8.0*t;
+
+                            cx += sx;
+                            cy += sy;
+
+                            if (t <= 0.2) {
+                                var carr = hexToRgb(query.color);
+                                for (var p = 0; p < query.text.length; ++p) {
+                                    createParticleAtPoint(cx + 0.5*ws.width, cy, [carr.r, carr.g, carr.b, t*128]);
+                                }
+                            }
 
                             ctx.fillStyle = query.color;
                             ctx.globalAlpha = 1.0 - t;
@@ -243,6 +285,8 @@
                             ctx.fillText(text, cx, cy);
                         }
                     }
+
+                    update_particles(ctx);
                 }
 
                 incppect.onerror = function(evt) {
@@ -313,8 +357,9 @@
                     <td width=180px align=left valign=top>
                         <h4>Rooms</h4>
                         <hr>
-                        <div id="room-list" align=left>
-                        </div>
+                        <div id="room-list" align=left></div>
+                        <hr>
+                        <pre><input type="checkbox" id="do-effects"> Effects</pre>
                     </td>
                     <td width=512px>
                         <canvas id="canvas_queries" width="512px" height="512px" style="border:1px solid #d3d3d3;">Your browser does not support the HTML5 canvas tag.</canvas>
