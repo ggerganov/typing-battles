@@ -27,7 +27,7 @@ var ExplodingParticle = function() {
             // Draw a circle at the current location
             ctx.beginPath();
             ctx.arc(p.startX, p.startY, p.radius, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(' + this.rgbArray[0] + ',' + this.rgbArray[1] + ',' + this.rgbArray[2] + ',' + this.rgbArray[2] + ')';
+            ctx.fillStyle = 'rgba(' + this.rgbArray[0] + ',' + this.rgbArray[1] + ',' + this.rgbArray[2] + ',' + this.rgbArray[3] + ')';
             ctx.fill();
 
             // Update the particle's location and life
