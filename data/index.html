@@ -86,7 +86,7 @@
                     var active = false;
                     var room = rooms[room_id];
 
-                    if (tcur_s < room.tstart_s + room.tlength_s) {
+                    if (tcur_s <= room.tstart_s + room.tlength_s + 0.09) {
                         active = true;
                         for (var i = 0; i < room.nqueries; ++i) {
                             room.pool[i] = {};
@@ -357,7 +357,7 @@
 
         </script>
 
-        <div id=main-container align=center width=876px>
+        <div id=main-container align=center width=900px>
             <br><br>
             <table>
                 <tr>
@@ -367,7 +367,7 @@
                     </th>
                 </tr>
                 <tr>
-                    <td width=180px align=left valign=top>
+                    <td width=200px align=left valign=top>
                         <h4>Rooms</h4>
                         <hr>
                         <div id="room-list" align=left></div>
@@ -377,7 +377,7 @@
                     <td width=512px>
                         <canvas id="canvas_queries" width="512px" height="512px" style="border:1px solid #d3d3d3;">Your browser does not support the HTML5 canvas tag.</canvas>
                     </td>
-                    <td width=180px align=right valign=top>
+                    <td width=200px align=right valign=top>
                         <h4>Leaderboard</h4>
                         <hr>
                         <div id="leaderboard" align=right>
