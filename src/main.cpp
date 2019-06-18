@@ -33,6 +33,8 @@ int main(int argc, char ** argv) {
 
     rooms.emplace_back(RoomWords::getCpp(RoomWords::Parameters { .pathData = pathData + "/" }));
     rooms.emplace_back(RoomWords::getCppBR(RoomWords::Parameters { .pathData = pathData + "/" }));
+    rooms.emplace_back(RoomWords::getBash(RoomWords::Parameters { .pathData = pathData + "/" }));
+    rooms.emplace_back(RoomWords::getBashBR(RoomWords::Parameters { .pathData = pathData + "/" }));
     rooms.emplace_back(RoomWords::getGit(RoomWords::Parameters { .pathData = pathData + "/" }));
     rooms.emplace_back(RoomWords::getGitBR(RoomWords::Parameters { .pathData = pathData + "/" }));
     //rooms.emplace_back(RoomWords::getEnglish(RoomWords::Parameters { .pathData = pathData + "/" }));
@@ -56,11 +58,11 @@ int main(int argc, char ** argv) {
     Incppect::getInstance().var("rooms[%d].pool[%d].x", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->pool[idxs[1]].x); });
     Incppect::getInstance().var("rooms[%d].pool[%d].y", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->pool[idxs[1]].y); });
     Incppect::getInstance().var("rooms[%d].pool[%d].text", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->pool[idxs[1]].text); });
-    Incppect::getInstance().var("rooms[%d].pool_old[%d].x", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->poolOld[idxs[1]].x); });
-    Incppect::getInstance().var("rooms[%d].pool_old[%d].y", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->poolOld[idxs[1]].y); });
-    Incppect::getInstance().var("rooms[%d].pool_old[%d].text", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->poolOld[idxs[1]].text); });
-    Incppect::getInstance().var("rooms[%d].pool_old[%d].color", [&](const auto & idxs) { return Incppect::view(clients[rooms[idxs[0]]->poolOld[idxs[1]].clientId].color); });
-    Incppect::getInstance().var("rooms[%d].pool_old[%d].tguessed_s", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->poolOld[idxs[1]].tGuessed_s); });
+    Incppect::getInstance().var("rooms[%d].pool_old[%d].x", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->lastOldQuery(idxs[1]).x); });
+    Incppect::getInstance().var("rooms[%d].pool_old[%d].y", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->lastOldQuery(idxs[1]).y); });
+    Incppect::getInstance().var("rooms[%d].pool_old[%d].text", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->lastOldQuery(idxs[1]).text); });
+    Incppect::getInstance().var("rooms[%d].pool_old[%d].color", [&](const auto & idxs) { return Incppect::view(clients[rooms[idxs[0]]->lastOldQuery(idxs[1]).clientId].color); });
+    Incppect::getInstance().var("rooms[%d].pool_old[%d].tguessed_s", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->lastOldQuery(idxs[1]).tGuessed_s); });
     Incppect::getInstance().var("rooms[%d].my_id[%d]", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->playerId(idxs[1])); });
     Incppect::getInstance().var("rooms[%d].players[%d].name", [&](const auto & idxs) { return Incppect::view(clients[rooms[idxs[0]]->players[idxs[1]].clientId].name); });
     Incppect::getInstance().var("rooms[%d].players[%d].color", [&](const auto & idxs) { return Incppect::view(clients[rooms[idxs[0]]->players[idxs[1]].clientId].color); });

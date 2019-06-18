@@ -75,7 +75,7 @@ struct RoomWords : public RoomBase {
         result->mode = Standard;
         result->name = "C++";
         result->dictionary = Dictionary::load(parameters.pathData + "words_cpp.txt");
-        result->poolSize = 30;
+        result->poolSize = 32;
         result->tCreated_s = timestamp_s();
         result->tRoundLength_s = 1.0f*60.f;
         result->tRoundStart_s = result->tCreated_s - result->tRoundLength_s;
@@ -89,7 +89,36 @@ struct RoomWords : public RoomBase {
         result->mode = BattleRoyale;
         result->name = "C++ [BR]";
         result->dictionary = Dictionary::load(parameters.pathData + "words_cpp.txt");
-        result->poolSize = 30;
+        result->poolSize = 32;
+        result->tCreated_s = timestamp_s();
+        result->tRoundLength_s = 0.25f*60.f;
+        result->tBRRoundLength_s = 0.25f*60.f;
+        result->tRoundStart_s = result->tCreated_s - result->tRoundLength_s;
+
+        return result;
+    }
+
+    static std::shared_ptr<RoomBase> getBash(Parameters parameters) {
+        auto result = std::make_shared<RoomWords>();
+
+        result->mode = Standard;
+        result->name = "Bash";
+        result->dictionary = Dictionary::load(parameters.pathData + "words_bash.txt");
+        result->poolSize = 32;
+        result->tCreated_s = timestamp_s();
+        result->tRoundLength_s = 1.0f*60.f;
+        result->tRoundStart_s = result->tCreated_s - result->tRoundLength_s;
+
+        return result;
+    }
+
+    static std::shared_ptr<RoomBase> getBashBR(Parameters parameters) {
+        auto result = std::make_shared<RoomWords>();
+
+        result->mode = BattleRoyale;
+        result->name = "Bash [BR]";
+        result->dictionary = Dictionary::load(parameters.pathData + "words_bash.txt");
+        result->poolSize = 32;
         result->tCreated_s = timestamp_s();
         result->tRoundLength_s = 0.25f*60.f;
         result->tBRRoundLength_s = 0.25f*60.f;
@@ -104,7 +133,7 @@ struct RoomWords : public RoomBase {
         result->mode = Standard;
         result->name = "Git";
         result->dictionary = Dictionary::load(parameters.pathData + "words_git.txt");
-        result->poolSize = 15;
+        result->poolSize = 16;
         result->tCreated_s = timestamp_s();
         result->tRoundLength_s = 1.0f*60.f;
         result->tRoundStart_s = result->tCreated_s - result->tRoundLength_s;
@@ -118,7 +147,7 @@ struct RoomWords : public RoomBase {
         result->mode = BattleRoyale;
         result->name = "Git [BR]";
         result->dictionary = Dictionary::load(parameters.pathData + "words_git.txt");
-        result->poolSize = 15;
+        result->poolSize = 16;
         result->tCreated_s = timestamp_s();
         result->tRoundLength_s = 0.25f*60.f;
         result->tBRRoundLength_s = 0.25f*60.f;
@@ -133,7 +162,7 @@ struct RoomWords : public RoomBase {
         result->mode = Standard;
         result->name = "English";
         result->dictionary = Dictionary::load(parameters.pathData + "words_alpha.txt");
-        result->poolSize = 30;
+        result->poolSize = 32;
         result->tCreated_s = timestamp_s();
         result->tRoundLength_s = 1.0f*60.f;
         result->tRoundStart_s = result->tCreated_s - result->tRoundLength_s;
@@ -147,7 +176,7 @@ struct RoomWords : public RoomBase {
         result->mode = BattleRoyale;
         result->name = "English [BR]";
         result->dictionary = Dictionary::load(parameters.pathData + "words_alpha.txt");
-        result->poolSize = 30;
+        result->poolSize = 32;
         result->tCreated_s = timestamp_s();
         result->tRoundLength_s = 0.25f*60.f;
         result->tBRRoundLength_s = 0.25f*60.f;
