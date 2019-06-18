@@ -7,6 +7,9 @@
 
     <body style="font-family: Georgia, serif;">
         <script>
+            var bot_enabled = false;
+            var bot_skill = 0.5;
+
             var room_id = localStorage['room-id'] || 0;
             var rules_str = "Scoring:\n - match: 3.0 + 0.2*input.length\n - no match: -1.0";
             var room_types = { 0: 'Standard', 1: 'Battle-Royale' };
@@ -83,7 +86,19 @@
                     var active = false;
                     var room = rooms[room_id];
 
-                    for (var i = 0; i < room.nold; ++i) {
+                    if (tcur_s < room.tstart_s + room.tlength_s) {
+                        active = true;
+                        for (var i = 0; i < room.nqueries; ++i) {
+                            room.pool[i] = {};
+                            room.pool[i].x = this.get_float('rooms[%d].pool[%d].x', room_id, i);
+                            room.pool[i].y = this.get_float('rooms[%d].pool[%d].y', room_id, i);
+                            room.pool[i].text = this.get_str('rooms[%d].pool[%d].text', room_id, i);
+                        }
+                    }
+
+                    var nold_cur = Math.min(active ? 16 : room.nold, room.nold);
+
+                    for (var i = 0; i < nold_cur; ++i) {
                         room.pool_old[i] = {};
                         room.pool_old[i].x = this.get_float('rooms[%d].pool_old[%d].x', room_id, i);
                         room.pool_old[i].y = this.get_float('rooms[%d].pool_old[%d].y', room_id, i);
@@ -99,16 +114,6 @@
                         room.players[i].color = this.get_str('rooms[%d].players[%d].color', room_id, i);
                         room.players[i].score = this.get_float('rooms[%d].players[%d].score', room_id, i);
                         room.players[i].active = this.get_int8('rooms[%d].players[%d].active', room_id, i);
-                    }
-
-                    if (tcur_s < room.tstart_s + room.tlength_s) {
-                        active = true;
-                        for (var i = 0; i < room.nqueries; ++i) {
-                            room.pool[i] = {};
-                            room.pool[i].x = this.get_float('rooms[%d].pool[%d].x', room_id, i);
-                            room.pool[i].y = this.get_float('rooms[%d].pool[%d].y', room_id, i);
-                            room.pool[i].text = this.get_str('rooms[%d].pool[%d].text', room_id, i);
-                        }
                     }
 
                     if (typeof room.roundid === 'undefined') {
@@ -186,7 +191,7 @@
                         var sy = 0.0;
 
                         if (do_effects) {
-                            for (var i = 0; i < room.nold; ++i) {
+                            for (var i = 0; i < nold_cur; ++i) {
                                 var query = room.pool_old[i];
                                 var t = Math.max(0.0, Math.min(1.0, 1.2*(tcur_s - query.tguessed_s)));
 
@@ -213,7 +218,7 @@
                             ctx.fillText(query.text, cx, cy);
                         }
 
-                        for (var i = 0; i < room.nold; ++i) {
+                        for (var i = 0; i < nold_cur; ++i) {
                             var query = room.pool_old[i];
                             var t = Math.max(0.0, Math.min(1.0, 1.2*(tcur_s - query.tguessed_s)));
 
@@ -234,6 +239,14 @@
                             ctx.fillStyle = query.color;
                             ctx.globalAlpha = 1.0 - t;
                             ctx.fillText(query.text, cx, cy);
+                            ctx.globalAlpha = 1.0;
+                        }
+
+                        if (bot_enabled) {
+                            if (Math.random() < Math.pow(0.2 + 0.2*bot_skill, 4)) {
+                                var qid = Math.floor(Math.random()*room.nqueries);
+                                incppect.send('30 ' + room_id + ' ' + room.pool[qid].text);
+                            }
                         }
                     } else {
                         var canvas = document.getElementById("canvas_queries");
@@ -247,7 +260,7 @@
                         ctx.font = '14px Arial';
                         ctx.globalAlpha = 1.0;
 
-                        for (var i = 0; i < room.nold; ++i) {
+                        for (var i = 0; i < nold_cur; ++i) {
                             var query = room.pool_old[i];
 
                             var ws = ctx.measureText(query.text);

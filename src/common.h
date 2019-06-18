@@ -156,6 +156,10 @@ struct RoomBase {
         return -1;
     }
 
+    Query & lastOldQuery(int32_t id) {
+        return poolOld[std::max(0, (int) poolOld.size() - id - 1)];
+    }
+
     virtual Query generate() = 0;
 
     virtual void handle(Event && event) {

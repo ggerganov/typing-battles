@@ -23,12 +23,11 @@ var ExplodingParticle = function() {
     this.draw = ctx => {
         let p = this;
 
-        if(this.remainingLife > 0
-            && this.radius > 0) {
+        if (this.remainingLife > 0 && this.radius > 0) {
             // Draw a circle at the current location
             ctx.beginPath();
             ctx.arc(p.startX, p.startY, p.radius, 0, Math.PI * 2);
-            ctx.fillStyle = "rgba(" + this.rgbArray[0] + ',' + this.rgbArray[1] + ',' + this.rgbArray[2] + ", 1)";
+            ctx.fillStyle = 'rgba(' + this.rgbArray[0] + ',' + this.rgbArray[1] + ',' + this.rgbArray[2] + ',' + this.rgbArray[2] + ')';
             ctx.fill();
 
             // Update the particle's location and life
@@ -53,14 +52,14 @@ function createParticleAtPoint(x, y, colorData) {
 
 function update_particles(ctx) {
     // Draw all of our particles in their new location
-    for(let i = 0; i < particles.length; i++) {
+    for (let i = 0; i < particles.length; i++) {
         particles[i].draw(ctx);
 
         // Simple way to clean up if the last particle is done animating
-        if(i === particles.length - 1) {
-            let percent = (Date.now() - particles[i].startTime) / particles[i].animationDuration[i];
+        if (i == particles.length - 1) {
+            let percent = (Date.now() - particles[i].startTime) / particles[i].animationDuration;
 
-            if(percent > 1) {
+            if (percent > 1) {
                 particles = [];
             }
         }
