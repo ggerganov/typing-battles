@@ -309,7 +309,7 @@ struct RoomBase {
                                     int playerId = -1;
                                     float minScore = 1e6;
                                     for (int i = 0; i < (int) players.size(); ++i) {
-                                        if (players[i].score < minScore) {
+                                        if (players[i].score < minScore && players[i].active == 1) {
                                             minScore = players[i].score;
                                             playerId = i;
                                         }
