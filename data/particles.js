@@ -40,12 +40,12 @@ var ExplodingParticle = function() {
     }
 }
 
-function createParticleAtPoint(x, y, colorData) {
+function createParticleAtPoint(x, y, colorData, delay) {
     let particle = new ExplodingParticle();
     particle.rgbArray = colorData;
     particle.startX = x;
     particle.startY = y;
-    particle.startTime = Date.now();
+    particle.startTime = Date.now() + delay;
     particle.endTime = particle.startTime + particle.animationDuration;
 
     particles.push(particle);
@@ -54,7 +54,12 @@ function createParticleAtPoint(x, y, colorData) {
 function update_particles(ctx) {
     // Draw all of our particles in their new location
     for (let i = 0; i < particles.length; i++) {
+        if (Date.now() < particles[i].startTime) {
+            continue;
+        }
+
         particles[i].draw(ctx);
+
         if (Date.now() > particles[i].endTime) {
             particles.splice(i, 1);
         }

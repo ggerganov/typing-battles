@@ -232,7 +232,7 @@
                             if (t <= 0.2) {
                                 var carr = hexToRgb(query.color);
                                 for (var p = 0; p < query.text.length; ++p) {
-                                    createParticleAtPoint(cx + 0.5*ws.width, cy, [carr.r, carr.g, carr.b, t*128]);
+                                    createParticleAtPoint(cx + (p/query.text.length)*ws.width, cy, [carr.r, carr.g, carr.b, t*128], p*15);
                                 }
                             }
 
