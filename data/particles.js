@@ -46,6 +46,7 @@ function createParticleAtPoint(x, y, colorData) {
     particle.startX = x;
     particle.startY = y;
     particle.startTime = Date.now();
+    particle.endTime = particle.startTime + particle.animationDuration;
 
     particles.push(particle);
 }
@@ -54,14 +55,8 @@ function update_particles(ctx) {
     // Draw all of our particles in their new location
     for (let i = 0; i < particles.length; i++) {
         particles[i].draw(ctx);
-
-        // Simple way to clean up if the last particle is done animating
-        if (i == particles.length - 1) {
-            let percent = (Date.now() - particles[i].startTime) / particles[i].animationDuration;
-
-            if (percent > 1) {
-                particles = [];
-            }
+        if (Date.now() > particles[i].endTime) {
+            particles.splice(i, 1);
         }
     }
 }
