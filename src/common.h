@@ -169,7 +169,7 @@ struct RoomBase {
                     if (event.roomId != id) return;
 
                     ++roundId;
-                    printf("Room %d: starting new round %d\n", id, roundId);
+                    //printf("Room %d: starting new round %d\n", id, roundId);
 
                     pool.clear();
                     poolOld.clear();
@@ -277,7 +277,7 @@ struct RoomBase {
                     switch (mode) {
                         case Standard:
                             {
-                                printf("Room %d: ending round %d\n", id, roundId);
+                                //printf("Room %d: ending round %d\n", id, roundId);
 
                                 Event event;
                                 event.roomId = id;
