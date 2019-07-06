@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/ggerganov/typing-battles.svg?branch=master)](https://travis-ci.org/ggerganov/typing-battles?branch=master)
+
 # typing-battles
 
 A multiplayer typing game.
