@@ -2,6 +2,12 @@
 
 A multiplayer typing game.
 
+## Public server
+
+http://85.90.246.132:5000
+
+## Screenshots
+
 <a href="https://i.imgur.com/drL2D9E.png" target="_blank">![typing-battles](https://i.imgur.com/drL2D9E.png)</a>
 
 <a href="https://i.imgur.com/YuTNEzt.png" target="_blank">![typing-battles](https://i.imgur.com/YuTNEzt.png)</a>
@@ -18,7 +24,7 @@ A multiplayer typing game.
     $ cmake ..
     $ make
     
-    $ ./src/main 3000
+    $ ./src/typing-battles 3000
     
 ## Connecting to a server
 
