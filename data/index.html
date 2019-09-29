@@ -45,7 +45,7 @@
                     var rooms = {};
                     var nrooms = this.get_int32('nrooms');
 
-                    tcur_s = this.get_float('tcur_s');
+                    tcur_s = this.get_double('tcur_s');
 
                     for (var i = 0; i < nrooms; ++i) {
                         rooms[i] = {};
@@ -55,9 +55,9 @@
                         rooms[i].nplayers = this.get_int32('rooms[%d].nplayers', i);
                         rooms[i].nqueries = this.get_int32('rooms[%d].nqueries', i);
                         rooms[i].nold = this.get_int32('rooms[%d].nold', i);
-                        rooms[i].tstart_s = this.get_float('rooms[%d].tstart_s', i);
-                        rooms[i].tnextstart_s = this.get_float('rooms[%d].tnextstart_s', i);
-                        rooms[i].tlength_s = this.get_float('rooms[%d].tlength_s', i);
+                        rooms[i].tstart_s = this.get_double('rooms[%d].tstart_s', i);
+                        rooms[i].tnextstart_s = this.get_double('rooms[%d].tnextstart_s', i);
+                        rooms[i].tlength_s = this.get_double('rooms[%d].tlength_s', i);
                         rooms[i].pool = {};
                         rooms[i].pool_old = {};
                         rooms[i].players = {};
@@ -104,7 +104,7 @@
                         room.pool_old[i].y = this.get_float('rooms[%d].pool_old[%d].y', room_id, i);
                         room.pool_old[i].text = this.get_str('rooms[%d].pool_old[%d].text', room_id, i);
                         room.pool_old[i].color = this.get_str('rooms[%d].pool_old[%d].color', room_id, i);
-                        room.pool_old[i].tguessed_s = this.get_float('rooms[%d].pool_old[%d].tguessed_s', room_id, i);
+                        room.pool_old[i].tguessed_s = this.get_double('rooms[%d].pool_old[%d].tguessed_s', room_id, i);
                     }
 
                     var my_id = this.get_int32('rooms[%d].my_id[%d]', room_id, -1);

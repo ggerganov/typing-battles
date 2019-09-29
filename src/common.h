@@ -13,6 +13,8 @@
 #include <mutex>
 #include <condition_variable>
 
+using TTimestamp = double;
+
 // ;(( ...
 namespace {
     inline float frand() { return (float)(rand())/RAND_MAX; }
@@ -22,7 +24,7 @@ namespace {
             std::chrono::steady_clock::now().time_since_epoch()).count();
     }
 
-    inline float timestamp_s() {
+    inline TTimestamp timestamp_s() {
         static auto tStart = timestamp_ms();
         return 0.001*(timestamp_ms() - tStart);
     }
@@ -66,7 +68,7 @@ struct Query {
     float y = 0.0f;
 
     int32_t clientId = 0;
-    float tGuessed_s = 0.0f;
+    TTimestamp tGuessed_s = 0.0f;
 
     std::string text;
     std::string answer;
@@ -131,11 +133,11 @@ struct RoomBase {
     int32_t roundId = 0;
     int32_t poolSize = 0;
 
-    float tCreated_s = 0.0f;
-    float tRoundStart_s = 0.0f;
-    float tRoundLength_s = 0.0f;
-    float tBRRoundLength_s = 0.0f;
-    float tNextRoundStart_s = 0.0f;
+    TTimestamp tCreated_s = 0.0f;
+    TTimestamp tRoundStart_s = 0.0f;
+    TTimestamp tRoundLength_s = 0.0f;
+    TTimestamp tBRRoundLength_s = 0.0f;
+    TTimestamp tNextRoundStart_s = 0.0f;
 
     uint64_t tTimeBetweenChecks_ms = 1000;
     uint64_t tTimeBetweenRounds_ms = 20000;
@@ -218,7 +220,7 @@ struct RoomBase {
                     switch (mode) {
                         case Standard:
                             {
-                                tNextRoundStart_s = timestamp_s() + 0.001f*tTimeBetweenRounds_ms;
+                                tNextRoundStart_s = timestamp_s() + 0.001*tTimeBetweenRounds_ms;
 
                                 notifier.notify([&]() {
                                     std::this_thread::sleep_for(std::chrono::milliseconds(tTimeBetweenRounds_ms));
@@ -241,7 +243,7 @@ struct RoomBase {
                                 }
 
                                 if (nActive > 1) {
-                                    tNextRoundStart_s = timestamp_s() + 0.001f*tTimeBetweenRounds_ms;
+                                    tNextRoundStart_s = timestamp_s() + 0.001*tTimeBetweenRounds_ms;
 
                                     notifier.notify([&]() {
                                         std::this_thread::sleep_for(std::chrono::milliseconds(tTimeBetweenRounds_ms));
@@ -253,7 +255,7 @@ struct RoomBase {
                                         notifier.events->push(std::move(event));
                                     });
                                 } else {
-                                    tNextRoundStart_s = timestamp_s() + 0.001f*tTimeBetweenRounds_ms;
+                                    tNextRoundStart_s = timestamp_s() + 0.001*tTimeBetweenRounds_ms;
 
                                     notifier.notify([&]() {
                                         std::this_thread::sleep_for(std::chrono::milliseconds(tTimeBetweenChecks_ms));
