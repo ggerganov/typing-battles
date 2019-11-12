@@ -6,7 +6,7 @@ A multiplayer typing game.
 
 ## Public server
 
-http://85.90.246.132:5000
+https://typing-battles.ggerganov.com
 
 ## Screenshots
 
@@ -28,4 +28,4 @@ http://85.90.246.132:5000
     
 ## Connecting to a server
 
-Open a browser and point it the server's ip:port. For example http://127.0.0.1:3000/
+Open a browser and point it the server's ip:port. For example https://127.0.0.1:3000/
