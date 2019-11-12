@@ -12,6 +12,8 @@
 #include <map>
 #include <sstream>
 
+using incppect = Incppect<true>;
+
 struct State {
     Events events;
     std::vector<std::shared_ptr<RoomBase>> rooms;
@@ -44,49 +46,49 @@ int main(int argc, char ** argv) {
     rooms.emplace_back(RoomMath::getMathSqrt(RoomMath::Parameters { }));
     rooms.emplace_back(RoomMath::getMathSqrtBR(RoomMath::Parameters { }));
 
-    Incppect::getInstance().var("tcur_s", [&](const auto & ) { return Incppect::view(timestamp_s()); });
-    Incppect::getInstance().var("nrooms", [&](const auto & ) { return Incppect::view(rooms.size()); });
-    Incppect::getInstance().var("rooms[%d].name", [&](const auto & idxs) { return rooms[idxs[0]]->name.data(); });
-    Incppect::getInstance().var("rooms[%d].mode", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->mode); });
-    Incppect::getInstance().var("rooms[%d].roundid", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->roundId); });
-    Incppect::getInstance().var("rooms[%d].nplayers", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->players.size()); });
-    Incppect::getInstance().var("rooms[%d].nqueries", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->poolSize); });
-    Incppect::getInstance().var("rooms[%d].nold", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->poolOld.size()); });
-    Incppect::getInstance().var("rooms[%d].tstart_s", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->tRoundStart_s); });
-    Incppect::getInstance().var("rooms[%d].tnextstart_s", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->tNextRoundStart_s); });
-    Incppect::getInstance().var("rooms[%d].tlength_s", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->tRoundLength_s); });
-    Incppect::getInstance().var("rooms[%d].pool[%d].x", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->pool[idxs[1]].x); });
-    Incppect::getInstance().var("rooms[%d].pool[%d].y", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->pool[idxs[1]].y); });
-    Incppect::getInstance().var("rooms[%d].pool[%d].text", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->pool[idxs[1]].text); });
-    Incppect::getInstance().var("rooms[%d].pool_old[%d].x", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->lastOldQuery(idxs[1]).x); });
-    Incppect::getInstance().var("rooms[%d].pool_old[%d].y", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->lastOldQuery(idxs[1]).y); });
-    Incppect::getInstance().var("rooms[%d].pool_old[%d].text", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->lastOldQuery(idxs[1]).text); });
-    Incppect::getInstance().var("rooms[%d].pool_old[%d].color", [&](const auto & idxs) { return Incppect::view(clients[rooms[idxs[0]]->lastOldQuery(idxs[1]).clientId].color); });
-    Incppect::getInstance().var("rooms[%d].pool_old[%d].tguessed_s", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->lastOldQuery(idxs[1]).tGuessed_s); });
-    Incppect::getInstance().var("rooms[%d].my_id[%d]", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->playerId(idxs[1])); });
-    Incppect::getInstance().var("rooms[%d].players[%d].name", [&](const auto & idxs) { return Incppect::view(clients[rooms[idxs[0]]->players[idxs[1]].clientId].name); });
-    Incppect::getInstance().var("rooms[%d].players[%d].color", [&](const auto & idxs) { return Incppect::view(clients[rooms[idxs[0]]->players[idxs[1]].clientId].color); });
-    Incppect::getInstance().var("rooms[%d].players[%d].score", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->players[idxs[1]].score); });
-    Incppect::getInstance().var("rooms[%d].players[%d].active", [&](const auto & idxs) { return Incppect::view(rooms[idxs[0]]->players[idxs[1]].active); });
+    incppect::getInstance().var("tcur_s", [&](const auto & ) { return incppect::view(timestamp_s()); });
+    incppect::getInstance().var("nrooms", [&](const auto & ) { return incppect::view(rooms.size()); });
+    incppect::getInstance().var("rooms[%d].name", [&](const auto & idxs) { return rooms[idxs[0]]->name.data(); });
+    incppect::getInstance().var("rooms[%d].mode", [&](const auto & idxs) { return incppect::view(rooms[idxs[0]]->mode); });
+    incppect::getInstance().var("rooms[%d].roundid", [&](const auto & idxs) { return incppect::view(rooms[idxs[0]]->roundId); });
+    incppect::getInstance().var("rooms[%d].nplayers", [&](const auto & idxs) { return incppect::view(rooms[idxs[0]]->players.size()); });
+    incppect::getInstance().var("rooms[%d].nqueries", [&](const auto & idxs) { return incppect::view(rooms[idxs[0]]->poolSize); });
+    incppect::getInstance().var("rooms[%d].nold", [&](const auto & idxs) { return incppect::view(rooms[idxs[0]]->poolOld.size()); });
+    incppect::getInstance().var("rooms[%d].tstart_s", [&](const auto & idxs) { return incppect::view(rooms[idxs[0]]->tRoundStart_s); });
+    incppect::getInstance().var("rooms[%d].tnextstart_s", [&](const auto & idxs) { return incppect::view(rooms[idxs[0]]->tNextRoundStart_s); });
+    incppect::getInstance().var("rooms[%d].tlength_s", [&](const auto & idxs) { return incppect::view(rooms[idxs[0]]->tRoundLength_s); });
+    incppect::getInstance().var("rooms[%d].pool[%d].x", [&](const auto & idxs) { return incppect::view(rooms[idxs[0]]->pool[idxs[1]].x); });
+    incppect::getInstance().var("rooms[%d].pool[%d].y", [&](const auto & idxs) { return incppect::view(rooms[idxs[0]]->pool[idxs[1]].y); });
+    incppect::getInstance().var("rooms[%d].pool[%d].text", [&](const auto & idxs) { return incppect::view(rooms[idxs[0]]->pool[idxs[1]].text); });
+    incppect::getInstance().var("rooms[%d].pool_old[%d].x", [&](const auto & idxs) { return incppect::view(rooms[idxs[0]]->lastOldQuery(idxs[1]).x); });
+    incppect::getInstance().var("rooms[%d].pool_old[%d].y", [&](const auto & idxs) { return incppect::view(rooms[idxs[0]]->lastOldQuery(idxs[1]).y); });
+    incppect::getInstance().var("rooms[%d].pool_old[%d].text", [&](const auto & idxs) { return incppect::view(rooms[idxs[0]]->lastOldQuery(idxs[1]).text); });
+    incppect::getInstance().var("rooms[%d].pool_old[%d].color", [&](const auto & idxs) { return incppect::view(clients[rooms[idxs[0]]->lastOldQuery(idxs[1]).clientId].color); });
+    incppect::getInstance().var("rooms[%d].pool_old[%d].tguessed_s", [&](const auto & idxs) { return incppect::view(rooms[idxs[0]]->lastOldQuery(idxs[1]).tGuessed_s); });
+    incppect::getInstance().var("rooms[%d].my_id[%d]", [&](const auto & idxs) { return incppect::view(rooms[idxs[0]]->playerId(idxs[1])); });
+    incppect::getInstance().var("rooms[%d].players[%d].name", [&](const auto & idxs) { return incppect::view(clients[rooms[idxs[0]]->players[idxs[1]].clientId].name); });
+    incppect::getInstance().var("rooms[%d].players[%d].color", [&](const auto & idxs) { return incppect::view(clients[rooms[idxs[0]]->players[idxs[1]].clientId].color); });
+    incppect::getInstance().var("rooms[%d].players[%d].score", [&](const auto & idxs) { return incppect::view(rooms[idxs[0]]->players[idxs[1]].score); });
+    incppect::getInstance().var("rooms[%d].players[%d].active", [&](const auto & idxs) { return incppect::view(rooms[idxs[0]]->players[idxs[1]].active); });
 
-    Incppect::getInstance().handler([&](int clientId, Incppect::EventType etype, std::string_view data) {
+    incppect::getInstance().handler([&](int clientId, incppect::EventType etype, std::string_view data) {
         Event event;
 
         event.clientId = clientId;
 
         switch (etype) {
-            case Incppect::Connect:
+            case incppect::Connect:
                 {
                     return;
                 }
                 break;
-            case Incppect::Disconnect:
+            case incppect::Disconnect:
                 {
                     event.type = Event::PlayerJoinRoom;
                     event.roomId = -1;
                 }
                 break;
-            case Incppect::Custom:
+            case incppect::Custom:
                 {
                     std::stringstream ss;
                     ss << data;
@@ -146,11 +148,15 @@ int main(int argc, char ** argv) {
         events.cv.notify_one();
     });
 
-    auto incppect = Incppect::getInstance().runAsync(Incppect::Parameters {
-        .portListen = port,
-        .maxPayloadLength_bytes = 256*1024,
-        .httpRoot = pathHttp,
-    });
+    incppect::Parameters parameters;
+
+    parameters.portListen = port;
+    parameters.maxPayloadLength_bytes = 256*1024;
+    parameters.httpRoot = pathHttp;
+    parameters.sslKey = "key.pem";
+    parameters.sslCert = "cert.pem";
+
+    auto incppect = incppect::getInstance().runAsync(parameters);
 
     for (int i = 0; i < (int) rooms.size(); ++i) {
         rooms[i]->id = i;
