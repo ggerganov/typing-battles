@@ -153,6 +153,7 @@ int main(int argc, char ** argv) {
     parameters.portListen = port;
     parameters.maxPayloadLength_bytes = 256*1024;
     parameters.httpRoot = pathHttp;
+    parameters.resources = { "", "index.html", "names.js", "particles.js", };
     parameters.sslKey = "key.pem";
     parameters.sslCert = "cert.pem";
 
